@@ -1,602 +1,551 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Om Sai Hostel - Secure Portal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subrat's Cinematic Birthday</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,600;1,600&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        night: '#050505',
+                        midnight: '#0a0a12',
+                        gold: '#FFD700',
+                        neonPurple: '#b026ff',
+                        glass: 'rgba(255, 255, 255, 0.05)',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        cinematic: ['Cinzel', 'serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 3s ease-in-out infinite alternate',
+                        'reveal': 'reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        glow: {
+                            'from': { boxShadow: '0 0 10px rgba(255, 215, 0, 0.1)' },
+                            'to': { boxShadow: '0 0 30px rgba(255, 215, 0, 0.4)' },
+                        },
+                        reveal: {
+                            '0%': { opacity: '0', transform: 'translateY(50px) scale(0.9)' },
+                            '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* --- GLOBAL VARIABLES --- */
-        :root {
-            --primary: #003366; --accent: #0066cc; --bg: #f4f6f9;
-            --white: #ffffff; --text-dark: #2c3e50; --text-light: #7f8c8d;
-            --success: #27ae60; --danger: #c0392b; --border: #e1e4e8;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+
+        /* Cinematic Background */
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text-dark); }
-
-        /* --- LOGIN SCREEN --- */
-        #login-section {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #003366, #000000);
-            z-index: 5000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; color: white;
+        .cinematic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
         }
-        .login-box {
-            background: white; color: #333; padding: 30px; border-radius: 15px;
-            width: 90%; max-width: 400px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
+        /* Snap Scroll for Gallery */
+        .snap-x-mandatory {
+            scroll-snap-type: x mandatory;
         }
-        .login-tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
-        .login-tab { flex: 1; padding: 10px; cursor: pointer; font-weight: bold; color: #888; transition: 0.3s; }
-        
-        /* Active Tab Style */
-        .login-tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #f0f8ff; }
-        
-        .login-input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        .btn-login { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px; }
-
-        .password-wrapper { position: relative; width: 100%; margin: 10px 0; }
-        .password-wrapper input { margin: 0; width: 100%; padding-right: 40px; }
-        .toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666; font-size: 1.1rem; }
-
-        /* --- PANELS --- */
-        #admin-panel, #student-panel { display: none; padding-bottom: 60px; }
-
-        header {
-            background: var(--primary); color: var(--white);
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 100;
+        .snap-center {
+            scroll-snap-align: center;
         }
-        .brand { display: flex; align-items: center; gap: 10px; }
-        .brand i { font-size: 1.5rem; color: #ffcc00; }
-        .logout-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
 
-        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-
-        /* TABS & SECTIONS */
-        .nav-tabs { display: flex; background: var(--white); padding: 5px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .nav-btn { flex: 1; border: none; background: none; padding: 12px; font-weight: 600; color: var(--text-light); cursor: pointer; border-radius: 6px; transition: 0.3s; }
-        .nav-btn.active { background: var(--accent); color: var(--white); }
-
-        .section { display: none; animation: fadeIn 0.3s ease-in-out; }
-        .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* STATS & CARDS */
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: var(--white); padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid var(--accent); }
-        .stat-num { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
-        .stat-label { font-size: 0.85rem; color: var(--text-light); }
-
-        .total-amount-box {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            color: white; padding: 20px; border-radius: 12px; text-align: center;
-            margin-bottom: 20px; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        /* Text Gradients */
+        .text-gradient-gold {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        .total-amount-label { font-size: 1rem; opacity: 0.9; }
-        .total-amount-value { font-size: 2.5rem; font-weight: bold; margin-top: 5px; }
 
-        .form-card { background: var(--white); padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 5px; color: var(--text-dark); }
-        input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; outline: none; box-sizing: border-box; }
-        .btn-primary { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
-
-        .room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .room-card { background: var(--white); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid var(--border); cursor: pointer; position: relative; overflow: hidden; }
-        .room-card.full { background: #fff5f5; border-color: #feb2b2; }
-        .room-number { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
-        .room-capacity { font-size: 0.85rem; color: var(--text-light); margin-top: 5px; }
+        /* Loader */
+        #loader {
+            transition: opacity 1s ease-out, visibility 1s ease-out;
+        }
         
-        .room-progress { height: 4px; background: #eee; margin-top: 10px; border-radius: 2px; overflow: hidden; }
-        .room-bar { height: 100%; background: var(--accent); transition: width 0.3s; }
-        .room-bar.full { background: var(--danger); }
+        /* Lightbox */
+        #lightbox {
+            backdrop-filter: blur(20px);
+        }
 
-        .student-card { background: var(--white); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border); cursor: pointer; }
-        .st-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
-        .st-details { flex: 1; }
-        .st-name { font-weight: 700; color: var(--text-dark); }
-        .st-sub { font-size: 0.85rem; color: var(--text-light); }
-        .st-badge { font-size: 0.7rem; font-weight: bold; padding: 2px 8px; border-radius: 12px; }
-        .bg-paid { background: #e8f5e9; color: var(--success); }
-        .bg-due { background: #fceceb; color: var(--danger); }
-
-        .expense-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--danger); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .exp-del-btn { color: #bbb; cursor: pointer; padding: 5px; }
-        .exp-del-btn:hover { color: var(--danger); }
-
-        .student-profile-header { text-align: center; background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        .sp-img { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; }
-        .sp-name { font-size: 1.5rem; font-weight: bold; margin: 10px 0 5px; }
-        .sp-detail { color: #666; font-size: 0.9rem; }
-
-        /* MODALS */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-        #room-modal { z-index: 2000; }
-        #student-modal { z-index: 2100; }
-
-        .modal { background: var(--white); width: 100%; max-width: 450px; border-radius: 12px; overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
-        .modal-header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 20px; overflow-y: auto; }
-        
-        /* Details Box */
-        .details-box { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e1e4e8; font-size: 0.95rem; color: #333; }
-        .details-box p { margin: 8px 0; border-bottom: 1px dashed #ddd; padding-bottom: 5px; display: flex; justify-content: space-between; }
-        .details-box p:last-child { border: none; }
-        .d-label { color: var(--text-light); font-weight: 600; }
-        .d-val { font-weight: bold; color: var(--text-dark); }
-
-        .pay-status-box { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border); }
-        .btn-pay { width: 100%; padding: 10px; background: var(--success); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-pay:disabled { background: #bdc3c7; cursor: not-allowed; }
-
-        .history-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 10px; }
-        .history-table th { text-align: left; color: var(--text-light); border-bottom: 1px solid var(--border); padding: 5px; }
-        .history-table td { padding: 8px 5px; border-bottom: 1px solid #f1f1f1; }
-        
-        .flex-row { display: flex; gap: 10px; }
-        .file-input-wrapper { border: 2px dashed var(--border); padding: 20px; text-align: center; border-radius: 8px; color: var(--text-light); cursor: pointer; }
-        #preview-img { max-width: 100%; height: 100px; object-fit: contain; display: none; margin: 10px auto; }
-
-        .sidebar-section { background: var(--white); padding: 15px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; }
-        .btn-backup { background: #2ecc71; color: white; padding: 10px; width: 100%; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .btn-restore { background: #e67e22; color: white; padding: 10px; width: 100%; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .edit-icon { color: var(--accent); cursor: pointer; margin-left: 10px; font-size: 0.9rem; }
-
+        /* Hide scrollbar for gallery but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
-<body>
+<body class="antialiased selection:bg-gold selection:text-black">
 
-    <div id="login-section">
-        <div style="font-size: 3rem; color: #ffcc00; margin-bottom: 10px;"><i class="fa-solid fa-building-shield"></i></div>
-        <h2 style="margin-bottom: 20px;">Om Sai Hostel Portal</h2>
-        <div class="login-box">
-            <div class="login-tabs">
-                <div class="login-tab active" onclick="switchLogin('admin')" id="tab-admin">Admin Login</div>
-                <div class="login-tab" onclick="switchLogin('student')" id="tab-student">Student Login</div>
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+    
+    <div id="loader" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center text-center">
+        <div class="relative">
+            <div class="w-24 h-24 border-t-2 border-b-2 border-gold rounded-full animate-spin mb-8 shadow-[0_0_30px_rgba(255,215,0,0.3)]"></div>
+            <div class="absolute inset-0 flex items-center justify-center font-cinematic text-gold text-2xl font-bold animate-pulse">S</div>
+        </div>
+        <h2 class="text-2xl font-cinematic text-white tracking-[0.5em] uppercase animate-pulse">Loading Memories</h2>
+    </div>
+
+    <button id="music-btn" class="fixed bottom-8 right-8 z-40 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-full text-white hover:bg-gold hover:text-black transition-all duration-300 group shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+        <div class="relative">
+            <span class="absolute -inset-2 rounded-full bg-gold/50 opacity-0 group-hover:animate-ping"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+        </div>
+    </button>
+    
+    <audio id="bg-music" loop>
+        <source src="bhai ka badde.mpeg.wav" type="audio/wav">
+        <source src="bhai ka badde.mpeg.wav" type="audio/mpeg">
+    </audio>
+
+    <main class="relative z-10 opacity-0 transition-opacity duration-1000" id="main-content">
+        
+        <section class="min-h-screen flex flex-col items-center justify-center relative px-4 overflow-hidden">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[100px] animate-pulse"></div>
+
+            <div class="text-center relative z-10 max-w-4xl mx-auto space-y-6">
+                <p class="text-gold tracking-[0.5em] uppercase text-sm md:text-base animate-[slideUp_1s_ease-out_0.5s_forwards] opacity-0">Lights. Camera. Memories.</p>
+                
+                <h1 class="text-6xl md:text-8xl lg:text-9xl font-cinematic font-bold leading-tight">
+                    <span class="block text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] animate-[reveal_1.5s_ease-out_0.8s_forwards] opacity-0 translate-y-10">HAPPY</span>
+                    <span class="block text-transparent bg-clip-text bg-gradient-to-r from-gold via-yellow-200 to-gold drop-shadow-[0_0_25px_rgba(255,215,0,0.5)] animate-[reveal_1.5s_ease-out_1s_forwards] opacity-0 translate-y-10">BIRTHDAY</span>
+                    <span class="block text-white font-sans font-light tracking-wider text-4xl md:text-6xl mt-4 animate-[reveal_1.5s_ease-out_1.2s_forwards] opacity-0 translate-y-10">SUBRAT</span>
+                </h1>
+
+                <div class="h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent mx-auto my-8"></div>
+
+                <p class="text-gray-300 text-lg md:text-xl font-light italic max-w-2xl mx-auto animate-[slideUp_1s_ease-out_1.5s_forwards] opacity-0">
+                    "A special day for a special brother. Here is to your journey, your memories, and your future."
+                </p>
+
+                <div class="pt-8 animate-[slideUp_1s_ease-out_1.8s_forwards] opacity-0">
+                    <a href="#gallery" class="group relative inline-flex items-center gap-3 px-8 py-4 bg-transparent overflow-hidden rounded-full border border-gold/30 hover:border-gold transition-all duration-500">
+                        <div class="absolute inset-0 w-0 bg-gold transition-all duration-[250ms] ease-out group-hover:w-full opacity-10"></div>
+                        <span class="relative text-gold group-hover:text-white tracking-widest uppercase text-sm font-bold">Enter The Memories</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                    </a>
+                </div>
             </div>
+        </section>
+
+        <section id="gallery" class="py-24 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-black to-transparent z-10"></div>
             
-            <div id="form-admin">
-                <input type="text" id="admin-id" class="login-input" placeholder="Admin ID">
-                <div class="password-wrapper">
-                    <input type="password" id="admin-pass" class="login-input" placeholder="Password">
-                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('admin-pass')"></i>
+            <div class="container mx-auto px-6 mb-12 flex items-end justify-between">
+                <div>
+                    <h2 class="text-4xl md:text-6xl font-cinematic text-white mb-2">Memory Reel</h2>
+                    <div class="h-1 w-20 bg-gold"></div>
                 </div>
-                <button class="btn-login" onclick="adminLogin()">Login as Admin</button>
+                <p class="hidden md:block text-gray-400 text-sm tracking-widest uppercase">Swipe to explore →</p>
             </div>
 
-            <div id="form-student" style="display: none;">
-                <p style="color:#666; font-size:0.9rem; margin-bottom:5px;">Enter your Password (T-Number)</p>
-                <div class="password-wrapper">
-                    <input type="password" id="student-pass" class="login-input" placeholder="Enter Password">
-                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('student-pass')"></i>
-                </div>
-                <button class="btn-login" onclick="studentLogin()">Login</button>
-            </div>
-            <p id="login-error" style="color: red; font-size: 0.9rem; margin-top: 10px;"></p>
-        </div>
-    </div>
-
-    <div id="admin-panel">
-        <header>
-            <div class="brand">
-                <i class="fa-solid fa-user-tie"></i>
-                <div><h2 id="admin-welcome">Admin Dashboard</h2><div style="font-size:0.7rem;">Om Sai Hostel</div></div>
-            </div>
-            <button class="logout-btn" onclick="logout()">Logout <i class="fa-solid fa-right-from-bracket"></i></button>
-        </header>
-
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-num" id="total-students">0</div><div class="stat-label">Total Students</div></div>
-                <div class="stat-card"><div class="stat-num" id="total-rooms">0</div><div class="stat-label">Total Rooms</div></div>
-            </div>
-
-            <div class="nav-tabs">
-                <button class="nav-btn active" onclick="showTab('dashboard')">Dashboard</button>
-                <button class="nav-btn" onclick="showTab('rooms')">Rooms</button>
-                <button class="nav-btn" onclick="showTab('expenses')">Expenses</button>
-                <button class="nav-btn" onclick="showTab('admission')">Admission</button>
-            </div>
-
-            <div id="sec-dashboard" class="section active">
-                <input type="text" id="search-inp" class="search-box" placeholder="Search Student..." onkeyup="renderDashboard()">
-                <div id="student-list"></div>
+            <div class="flex overflow-x-auto snap-x-mandatory no-scrollbar pb-12 px-6 gap-6 md:gap-10">
                 
-                <div class="sidebar-section">
-                    <h4 style="margin-top:0; color:var(--text-dark);">Data Backup</h4>
-                    <button class="btn-backup" onclick="downloadBackup()"><i class="fa-solid fa-download"></i> Backup</button>
-                    <button class="btn-restore" onclick="document.getElementById('restore-file').click()"><i class="fa-solid fa-upload"></i> Restore</button>
-                    <input type="file" id="restore-file" style="display: none;" onchange="restoreBackup(this)">
-                </div>
-            </div>
-
-            <div id="sec-rooms" class="section">
-                <div class="form-card" style="margin-bottom: 20px;">
-                    <h3 style="margin-top:0;">Add Room</h3>
-                    <div class="flex-row">
-                        <input type="text" id="new-r-no" placeholder="Room No">
-                        <input type="number" id="new-r-cap" placeholder="Capacity">
-                    </div>
-                    <button class="btn-primary" onclick="addRoom()">Create Room</button>
-                </div>
-                <div id="room-grid" class="room-grid"></div>
-            </div>
-
-            <div id="sec-expenses" class="section">
-                <div class="form-card" style="margin-bottom:15px;">
-                    <h4>Add Expense</h4>
-                    <div class="flex-row">
-                        <input type="text" id="exp-desc" placeholder="Description">
-                        <input type="number" id="exp-amt" placeholder="Amount (₹)">
-                    </div>
-                    <button class="btn-primary" onclick="addExpense()">Add Expense</button>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card sc-green"><div class="stat-num" id="stat-income">₹0</div><div class="stat-label">Income</div></div>
-                    <div class="stat-card sc-red"><div class="stat-num" id="stat-expense">₹0</div><div class="stat-label">Expense</div></div>
-                    <div class="stat-card"><div class="stat-num" id="stat-profit">₹0</div><div class="stat-label">Profit</div></div>
-                </div>
-                <div id="expense-list"></div>
-            </div>
-
-            <div id="sec-admission" class="section">
-                <div class="form-card">
-                    <h3 style="margin-top:0; color:var(--primary);">Admission Form</h3>
-                    <div class="form-group"><label>T-Number (Password)</label><input type="text" id="adm-tnum" placeholder="Example: T-101"></div>
-                    <div class="form-group"><label>Room</label><select id="adm-room"><option value="">Select Room</option></select></div>
-                    <div class="form-group"><label>Name</label><input type="text" id="adm-name"></div>
-                    <div class="flex-row">
-                        <div class="form-group" style="flex:1"><label>Mobile</label><input type="number" id="adm-mobile"></div>
-                        <div class="form-group" style="flex:1"><label>Rent Amount (₹)</label><input type="number" id="adm-rent" placeholder="5000"></div>
-                    </div>
-                    <div class="form-group"><label>Parent Name</label><input type="text" id="adm-parent"></div>
-                    <div class="form-group"><label>Join Date</label><input type="date" id="adm-date"></div>
-                    <div class="form-group"><label>Photo</label>
-                        <div class="file-input-wrapper" onclick="document.getElementById('adm-photo').click()"><i class="fa-solid fa-cloud-upload-alt"></i> Upload</div>
-                        <input type="file" id="adm-photo" hidden accept="image/*" onchange="previewImage(this)">
-                        <img id="preview-img">
-                    </div>
-                    <button class="btn-primary" onclick="registerStudent()">Register</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="student-panel">
-        <header>
-            <div class="brand"><i class="fa-solid fa-user-graduate"></i><div><h2>Student Portal</h2><div style="font-size:0.7rem;">Om Sai Hostel</div></div></div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
-        </header>
-        <div class="container">
-            <div class="student-profile-header">
-                <img id="sp-img" class="sp-img" src="">
-                <h2 id="sp-name" class="sp-name"></h2>
-                <div class="sp-detail" id="sp-tnum"></div>
-                <div class="sp-detail" id="sp-room"></div>
-            </div>
-            <div class="total-amount-box">
-                <div class="total-amount-label">Monthly Rent</div>
-                <div class="total-amount-value" id="sp-amount">₹0</div>
-            </div>
-            <div class="form-card">
-                <h3 style="border-bottom:1px solid #eee; padding-bottom:10px;">Payment Status (<span id="sp-curr-month"></span>)</h3>
-                <div id="sp-status-display" style="font-size: 1.5rem; font-weight: bold; margin: 20px 0; text-align: center;"></div>
-                <h4 style="margin-top: 30px;">History</h4>
-                <table class="history-table"><thead><tr><th>Month</th><th>Date</th></tr></thead><tbody id="sp-history"></tbody></table>
-            </div>
-        </div>
-    </div>
-
-    <div id="student-modal" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header"><h3>Student Profile</h3><i class="fa-solid fa-times" onclick="closeModal('student-modal')" style="cursor:pointer;"></i></div>
-            <div class="modal-body">
-                <div style="text-align:center; margin-bottom:15px;">
-                    <img id="m-img" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--border);">
-                    <h3 id="m-name" style="margin:5px 0; color:var(--primary);"></h3>
-                    <div id="m-tnum" style="font-weight:bold; color:var(--text-dark);"></div>
-                    <div id="m-room" style="color:var(--text-light);"></div>
-                    <div style="color:green; font-weight:bold; margin-top:5px;">
-                        <span id="m-rent-display"></span> 
-                        <i class="fa-solid fa-pen-to-square edit-icon" onclick="editRent()" title="Edit Rent"></i>
+                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
+                    <img src="https://image2url.com/r2/default/images/1771309046964-30aa8fc5-01e6-4feb-a7bf-95841def4090.jpeg" alt="Style Icon" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100 object-top">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">The Look</span>
+                        <h3 class="text-3xl font-cinematic text-white">Main Character Energy</h3>
                     </div>
                 </div>
 
-                <div class="details-box">
-                    <p><span class="d-label">📞 Mobile:</span> <span class="d-val" id="m-mobile"></span></p>
-                    <p><span class="d-label">👨‍👩‍👦 Parent:</span> <span class="d-val" id="m-parent"></span></p>
-                    <p><span class="d-label">📅 Joined:</span> <span class="d-val" id="m-join"></span></p>
+                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
+                    <img src="https://image2url.com/r2/default/images/1771309209887-f1a347fa-46fe-4494-9d0f-2004454257ad.jpeg" alt="Adventure" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Explore</span>
+                        <h3 class="text-3xl font-cinematic text-white">The Traveller</h3>
+                    </div>
                 </div>
 
-                <div class="pay-status-box">
-                    <div style="font-size:0.8rem;">Status: <span id="m-curr-month"></span></div>
-                    <div id="m-status-text" style="font-size:1.2rem; font-weight:bold; margin:10px 0;"></div>
-                    <button id="btn-pay" style="width:100%; padding:10px; background:var(--success); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="processPayment()">Accept Payment</button>
+                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
+                    <img src="https://image2url.com/r2/default/images/1771309269428-e7ac7882-f84e-47b7-9817-870bd59ef0f2.jpeg" alt="Sunset" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Vibes</span>
+                        <h3 class="text-3xl font-cinematic text-white">Golden Moments</h3>
+                    </div>
                 </div>
 
-                <h4>History</h4>
-                <div style="max-height:150px; overflow-y:auto;"><table class="history-table"><tbody id="m-history"></tbody></table></div>
+                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
+                    <img src="https://image2url.com/r2/default/images/1771309331385-950c1717-f298-4cc9-96c9-11f342ceeeb0.jpeg" alt="Cliff View" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Brotherhood</span>
+                        <h3 class="text-3xl font-cinematic text-white">Day One Homies</h3>
+                    </div>
+                </div>
+
+                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
+                    <img src="https://image2url.com/r2/default/images/1771309388916-c05474fe-d30e-4625-80bf-2a4827922d43.jpeg" alt="Scenic" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Vision</span>
+                        <h3 class="text-3xl font-cinematic text-white">Scenic Views</h3>
+                    </div>
+                </div>
+
+                 <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
+                    <img src="https://image2url.com/r2/default/images/1771309440014-e65214be-4853-4f38-b8f6-6d42ef9cb133.jpeg" alt="Smile" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Joy</span>
+                        <h3 class="text-3xl font-cinematic text-white">Always Smiling</h3>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="py-24 relative px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-4xl md:text-5xl font-cinematic text-center mb-16 scroll-trigger opacity-0 translate-y-10 transition-all duration-700">Subrat's Journey</h2>
                 
-                <button onclick="deleteStudent()" style="width:100%; margin-top:15px; padding:10px; background:var(--danger); color:white; border:none; border-radius:6px; cursor:pointer;">Delete Student</button>
-            </div>
-        </div>
-    </div>
+                <div class="relative border-l-2 border-white/10 ml-4 md:ml-1/2 space-y-12 md:space-y-24">
+                    
+                    <div class="relative pl-8 md:pl-0 scroll-trigger opacity-0 translate-y-10 transition-all duration-700 delay-100">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gold shadow-[0_0_10px_rgba(255,215,0,0.8)]"></div>
+                        <div class="md:flex md:justify-between md:items-center w-full">
+                            <div class="md:w-[45%] md:text-right md:pr-12 mb-2 md:mb-0 order-1">
+                                <span class="text-gold font-bold text-xl font-cinematic">17 Feb, 2000</span>
+                                <h3 class="text-white text-2xl font-bold">The Beginning</h3>
+                            </div>
+                            <div class="md:w-[45%] md:pl-12 order-2">
+                                <p class="text-gray-400 font-light">A legend was born. The day the world became a brighter place.</p>
+                            </div>
+                        </div>
+                    </div>
 
-    <div id="room-modal" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header"><h3>Room Details</h3><i class="fa-solid fa-times" onclick="closeModal('room-modal')" style="cursor:pointer;"></i></div>
-            <div class="modal-body">
-                <p id="rm-stats" style="color:var(--text-light); margin-bottom:15px;"></p>
-                <h4 style="color:var(--primary);">Students in Room:</h4>
-                <div id="rm-list"></div>
-                <div style="margin-top:20px; text-align:center;">
-                    <button onclick="deleteRoom()" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:8px; border-radius:6px; cursor:pointer;">Delete Room</button>
+                    <div class="relative pl-8 md:pl-0 scroll-trigger opacity-0 translate-y-10 transition-all duration-700 delay-100">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]"></div>
+                        <div class="md:flex md:justify-between md:items-center w-full">
+                            <div class="md:w-[45%] md:text-right md:pr-12 mb-2 md:mb-0 md:order-2">
+                                <p class="text-gray-400 font-light">From backyard cricket to school debates, you always stood out.</p>
+                            </div>
+                            <div class="md:w-[45%] md:pl-12 md:order-1">
+                                <span class="text-purple-400 font-bold text-xl font-cinematic">2012</span>
+                                <h3 class="text-white text-2xl font-bold">Childhood Memories</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-8 md:pl-0 scroll-trigger opacity-0 translate-y-10 transition-all duration-700 delay-100">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gold shadow-[0_0_10px_rgba(255,215,0,0.8)]"></div>
+                        <div class="md:flex md:justify-between md:items-center w-full">
+                            <div class="md:w-[45%] md:text-right md:pr-12 mb-2 md:mb-0 order-1">
+                                <span class="text-gold font-bold text-xl font-cinematic">2023</span>
+                                <h3 class="text-white text-2xl font-bold">Big Achievements</h3>
+                            </div>
+                            <div class="md:w-[45%] md:pl-12 order-2">
+                                <p class="text-gray-400 font-light">Graduation, first job, or that big win. You made us all proud.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-8 md:pl-0 scroll-trigger opacity-0 translate-y-10 transition-all duration-700 delay-100">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
+                        <div class="md:flex md:justify-between md:items-center w-full">
+                            <div class="md:w-[45%] md:text-right md:pr-12 mb-2 md:mb-0 md:order-2">
+                                <p class="text-gray-400 font-light">The sky is the limit. Keep chasing your dreams, brother.</p>
+                            </div>
+                            <div class="md:w-[45%] md:pl-12 md:order-1">
+                                <span class="text-blue-400 font-bold text-xl font-cinematic">Future</span>
+                                <h3 class="text-white text-2xl font-bold">Next Chapter</h3>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
+        </section>
+
+        <section class="py-24 px-6 flex justify-center">
+            <div class="max-w-2xl w-full relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-gold via-purple-500 to-blue-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                
+                <div class="relative p-10 bg-black border border-white/10 rounded-2xl backdrop-blur-xl">
+                    <div class="absolute top-0 right-0 p-6 opacity-20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 7.55228 14.017 7V6C14.017 5.44772 14.4647 5 15.017 5H19.017C20.6739 5 22.017 6.34315 22.017 8V15C22.017 18.3137 19.3307 21 16.017 21H14.017ZM3.017 21L3.017 18C3.017 16.8954 3.91243 16 5.017 16H8.017C8.56928 16 9.017 15.5523 9.017 15V9C9.017 8.44772 8.56928 8 8.017 8H4.017C3.46472 8 3.017 7.55228 3.017 7V6C3.017 5.44772 3.46472 5 4.017 5H8.017C9.67386 5 11.017 6.34315 11.017 8V15C11.017 18.3137 8.33071 21 5.017 21H3.017Z" /></svg>
+                    </div>
+
+                    <h2 class="text-3xl font-cinematic text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-6">Dear Subrat,</h2>
+                    <p class="text-xl font-light leading-relaxed text-gray-300 mb-6">
+                        You are not just my brother, you are my strength and my inspiration. May your life always be filled with happiness, success, peace, and love. Thank you for being the amazing person you are.
+                    </p>
+                    <p class="text-gold font-handwriting text-2xl font-bold">Happy Birthday ❤️</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 text-center">
+            <button id="celebrate-btn" class="group relative px-10 py-5 bg-transparent rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-20 group-hover:opacity-100 transition-opacity duration-500 blur-lg"></div>
+                <div class="absolute inset-0 border border-white/20 rounded-full"></div>
+                <span class="relative z-10 flex items-center gap-3 text-xl font-bold text-white tracking-widest uppercase">
+                    <span>✨ Celebration Mode</span>
+                </span>
+            </button>
+            <p class="text-gray-500 text-sm mt-4">Tap for a surprise!</p>
+        </section>
+
+        <section class="py-24 px-6 bg-black/50 backdrop-blur-sm">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-4xl font-cinematic text-center mb-12 text-white">Write a Wish ✍️</h2>
+                
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10">
+                        <form id="wish-form" class="space-y-6">
+                            <div>
+                                <label class="block text-gray-400 text-xs uppercase tracking-widest mb-2">Your Name</label>
+                                <input type="text" id="wisher-name" required class="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white focus:outline-none focus:border-gold focus:shadow-[0_0_10px_rgba(255,215,0,0.2)] transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 text-xs uppercase tracking-widest mb-2">Your Wish</label>
+                                <textarea id="wisher-msg" rows="4" required class="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white focus:outline-none focus:border-gold focus:shadow-[0_0_10px_rgba(255,215,0,0.2)] transition-all"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-gold text-black font-bold py-3 rounded-lg hover:bg-yellow-400 transition-colors shadow-lg">Send Wish 🚀</button>
+                        </form>
+                    </div>
+
+                    <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar" id="wishes-container">
+                        <div class="p-6 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/5 hover:border-white/20 transition-all">
+                            <h4 class="text-gold font-bold mb-1">Mom & Dad</h4>
+                            <p class="text-gray-300 font-light italic text-sm">"We love you so much son. Proud of you!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="py-12 text-center border-t border-white/5">
+            <p class="text-gray-500 font-light tracking-widest uppercase text-sm">
+                Made with <span class="text-red-500 animate-pulse">❤️</span> for Subrat
+            </p>
+        </footer>
+    </main>
+
+    <div id="lightbox" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 p-4 transition-opacity duration-300 opacity-0" onclick="closeLightbox()">
+        <button class="absolute top-6 right-6 text-white text-4xl hover:text-gold">&times;</button>
+        <img id="lightbox-img" src="" class="max-w-full max-h-[90vh] rounded-lg shadow-[0_0_50px_rgba(255,255,255,0.1)] transform scale-95 transition-transform duration-300">
+        <div class="absolute bottom-8 left-0 w-full text-center">
+            <h3 id="lightbox-caption" class="text-2xl font-cinematic text-white drop-shadow-lg"></h3>
         </div>
     </div>
 
     <script>
-        // --- DATA ---
-        let students = JSON.parse(localStorage.getItem('omSaiStudents')) || [];
-        let rooms = JSON.parse(localStorage.getItem('omSaiRooms')) || [];
-        let expenses = JSON.parse(localStorage.getItem('omSaiExpenses')) || [];
-        
-        let activeStudentId = null;
-        let activeRoomNo = null;
-        
-        const ADMINS = [
-            { id: "debi", pass: "prasad@426", name: "Debi Prasad Swin" },
-            { id: "omm",  pass: "sai@426",    name: "Omm Sairam Mahanta" }
-        ];
+        /* --- 1. Loader Logic --- */
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            const main = document.getElementById('main-content');
+            
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+                main.style.opacity = '1';
+                
+                // Trigger particles after load
+                initParticles();
+            }, 2500); // 2.5s cinematic intro time
+        });
 
-        const now = new Date();
-        const currentMonth = `${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][now.getMonth()]} ${now.getFullYear()}`;
+        /* --- 2. Canvas Particles System --- */
+        function initParticles() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
 
-        function togglePassword(id) {
-            const x = document.getElementById(id);
-            if (x.type === "password") { x.type = "text"; } else { x.type = "password"; }
-        }
+            const particles = [];
+            const particleCount = 70; // Optimized for performance
 
-        function switchLogin(type) {
-            document.getElementById('login-error').innerText = "";
-            document.getElementById('tab-admin').classList.toggle('active', type==='admin');
-            document.getElementById('tab-student').classList.toggle('active', type==='student');
-            document.getElementById('form-admin').style.display = type==='admin' ? 'block' : 'none';
-            document.getElementById('form-student').style.display = type==='student' ? 'block' : 'none';
-        }
-
-        function adminLogin() {
-            const id = document.getElementById('admin-id').value.trim();
-            const pass = document.getElementById('admin-pass').value.trim();
-            const admin = ADMINS.find(a => a.id === id && a.pass === pass);
-            if(admin) {
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                document.getElementById('admin-welcome').innerText = "Welcome, " + admin.name;
-                initAdmin();
-            } else { document.getElementById('login-error').innerText = "Wrong ID or Password!"; }
-        }
-
-        function studentLogin() {
-            const pass = document.getElementById('student-pass').value.trim();
-            const student = students.find(s => s.tNumber === pass);
-            if(student) {
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('student-panel').style.display = 'block';
-                loadStudentDashboard(student);
-            } else { document.getElementById('login-error').innerText = "Invalid Password (T-Number)!"; }
-        }
-
-        function logout() { location.reload(); }
-
-        /* STUDENT VIEW */
-        function loadStudentDashboard(s) {
-            document.getElementById('sp-name').innerText = s.name;
-            document.getElementById('sp-tnum').innerText = "ID: " + s.tNumber;
-            document.getElementById('sp-room').innerText = "Room: " + s.room;
-            document.getElementById('sp-img').src = s.image || 'https://via.placeholder.com/100';
-            document.getElementById('sp-curr-month').innerText = currentMonth;
-            document.getElementById('sp-amount').innerText = "₹" + (s.rent || 0);
-
-            const isPaid = s.payments.some(p => p.month === currentMonth);
-            document.getElementById('sp-status-display').innerHTML = isPaid ? `<span style="color:var(--success)">✅ PAID</span>` : `<span style="color:var(--danger)">❌ PENDING</span>`;
-            const hist = document.getElementById('sp-history');
-            hist.innerHTML = '';
-            s.payments.slice().reverse().forEach(p => { hist.innerHTML += `<tr><td>${p.month}</td><td>${p.date}</td></tr>`; });
-        }
-
-        /* ADMIN VIEW */
-        function initAdmin() { renderDashboard(); renderRooms(); renderExpenses(); updateStats(); }
-        function showTab(t) {
-            document.querySelectorAll('.section').forEach(e=>e.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active'));
-            document.getElementById('sec-'+t).classList.add('active');
-            event.currentTarget.classList.add('active');
-            if(t==='rooms') renderRooms();
-            if(t==='admission') loadRoomDropdown();
-            if(t==='expenses') renderExpenses();
-        }
-
-        function loadRoomDropdown() {
-            const s = document.getElementById('adm-room'); s.innerHTML = '<option value="">Select Room</option>';
-            rooms.forEach(r => {
-                if(students.filter(st=>st.room == r.no).length < r.cap) {
-                    let o = document.createElement('option'); o.value = r.no; o.innerText = `Room ${r.no}`; s.appendChild(o);
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2;
+                    this.speedX = (Math.random() - 0.5) * 0.2;
+                    this.speedY = (Math.random() - 0.5) * 0.2;
+                    this.opacity = Math.random() * 0.5;
                 }
-            });
-        }
-
-        function registerStudent() {
-            const tnum=document.getElementById('adm-tnum').value, room=document.getElementById('adm-room').value, name=document.getElementById('adm-name').value;
-            const mobile=document.getElementById('adm-mobile').value, parent=document.getElementById('adm-parent').value, date=document.getElementById('adm-date').value;
-            const rent=document.getElementById('adm-rent').value;
-            const img = document.getElementById('preview-img').src;
-            
-            if(!tnum || !room || !name || !rent) return alert("Required fields missing");
-            if(students.some(s=>s.tNumber===tnum)) return alert("T-Number exists");
-            
-            students.push({ id: Date.now(), tNumber: tnum, name, room, mobile, parent, date, rent, image: img.includes('base64') ? img : '', payments: [] });
-            saveData(); alert("Added!"); document.getElementById('adm-tnum').value=''; renderDashboard();
-        }
-
-        function previewImage(i) {
-            const r = new FileReader(); r.onload = e => { document.getElementById('preview-img').src = e.target.result; document.getElementById('preview-img').style.display='block'; };
-            if(i.files[0]) r.readAsDataURL(i.files[0]);
-        }
-
-        function renderDashboard() {
-            const l = document.getElementById('student-list'), q = document.getElementById('search-inp').value.toLowerCase();
-            l.innerHTML = '';
-            students.filter(s=>s.name.toLowerCase().includes(q) || s.tNumber.toLowerCase().includes(q)).forEach(s => {
-                const paid = s.payments.some(p=>p.month===currentMonth);
-                l.innerHTML += `
-                <div class="student-card" onclick="openAdminProfile(${s.id})">
-                    <img src="${s.image||'https://via.placeholder.com/50'}" class="st-img">
-                    <div class="st-info">
-                        <div class="st-name">${s.name}</div>
-                        <div class="st-details">${s.tNumber} | Room: ${s.room}</div>
-                    </div>
-                    <span class="st-badge ${paid?'bg-paid':'bg-due'}">${paid?'PAID':'DUE'}</span>
-                </div>`;
-            });
-            updateStats();
-        }
-
-        function openAdminProfile(id) {
-            activeStudentId = id; const s = students.find(x=>x.id===id);
-            document.getElementById('m-name').innerText = s.name;
-            document.getElementById('m-tnum').innerText = s.tNumber;
-            document.getElementById('m-room').innerText = "Room " + s.room;
-            document.getElementById('m-rent-display').innerText = "Rent: ₹" + (s.rent || 0);
-            document.getElementById('m-img').src = s.image || 'https://via.placeholder.com/100';
-            document.getElementById('m-curr-month').innerText = currentMonth;
-            
-            // FIXED: Populate missing fields
-            document.getElementById('m-mobile').innerText = s.mobile || "N/A";
-            document.getElementById('m-parent').innerText = s.parent || "N/A";
-            document.getElementById('m-join').innerText = s.date || "N/A";
-
-            const paid = s.payments.some(p=>p.month===currentMonth);
-            document.getElementById('m-status-text').innerHTML = paid ? `<span style="color:var(--success)">PAID ✅</span>` : `<span style="color:var(--danger)">PENDING ❌</span>`;
-            const btn = document.getElementById('btn-pay');
-            if(paid) { btn.innerText="Received"; btn.disabled=true; btn.style.background="#ccc"; } 
-            else { btn.innerText="Accept Payment"; btn.disabled=false; btn.style.background="var(--success)"; }
-            
-            const h = document.getElementById('m-history'); h.innerHTML='';
-            s.payments.slice().reverse().forEach(p=>{ h.innerHTML+=`<tr><td>${p.month}</td><td>${p.date}</td></tr>`; });
-            
-            document.getElementById('room-modal').style.display = 'none';
-            document.getElementById('student-modal').style.display = 'flex';
-        }
-
-        function editRent() {
-            if(!activeStudentId) return;
-            const s = students.find(x => x.id === activeStudentId);
-            const newRent = prompt("Enter New Rent Amount (₹):", s.rent);
-            if(newRent && !isNaN(newRent)) {
-                s.rent = newRent;
-                saveData();
-                document.getElementById('m-rent-display').innerText = "Rent: ₹" + s.rent;
-                alert("Rent Updated!");
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                }
+                draw() {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
-        }
 
-        function processPayment() {
-            const i = students.findIndex(x=>x.id===activeStudentId);
-            students[i].payments.push({ month: currentMonth, date: new Date().toLocaleDateString() });
-            saveData(); openAdminProfile(activeStudentId); renderDashboard();
-        }
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
 
-        function deleteStudent() {
-            if(confirm("Delete?")) { students = students.filter(x=>x.id!==activeStudentId); saveData(); closeModal('student-modal'); renderDashboard(); }
-        }
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
 
-        function addRoom() {
-            const no = document.getElementById('new-r-no').value, cap = document.getElementById('new-r-cap').value;
-            if(!no||!cap) return; if(rooms.some(r=>r.no===no)) return alert("Exists");
-            rooms.push({no, cap: parseInt(cap)}); saveData(); renderRooms();
-        }
-
-        function renderRooms() {
-            const g = document.getElementById('room-grid'); g.innerHTML='';
-            rooms.sort((a,b)=>a.no-b.no).forEach(r => {
-                const c = students.filter(s=>s.room==r.no).length;
-                const pct = (c/r.cap)*100;
-                g.innerHTML += `<div class="room-card ${c>=r.cap?'full':''}" onclick="openRoomView('${r.no}',${r.cap})">
-                    <div class="room-number">${r.no}</div>
-                    <div class="room-capacity">${c}/${r.cap}</div>
-                    <div class="room-progress"><div class="room-bar ${c>=r.cap?'full':''}" style="width:${pct}%"></div></div>
-                </div>`;
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
             });
         }
 
-        function openRoomView(no, cap) {
-            activeRoomNo = no; const inRoom = students.filter(s=>s.room==no);
-            document.getElementById('rm-stats').innerText = `Cap: ${cap} | Occ: ${inRoom.length}`;
-            const l = document.getElementById('rm-list'); l.innerHTML = '';
-            if(inRoom.length === 0) l.innerHTML = '<div style="text-align:center; color:#ccc;">Empty</div>';
-            inRoom.forEach(s => { l.innerHTML += `<div class="student-card" onclick="openAdminProfile(${s.id})"><div class="st-name">${s.name}</div></div>`; });
-            document.getElementById('room-modal').style.display = 'flex';
-        }
-
-        function deleteRoom() {
-            if(confirm("Delete Room?")) { rooms = rooms.filter(r=>r.no!==activeRoomNo); saveData(); closeModal('room-modal'); renderRooms(); }
-        }
-
-        function addExpense() {
-            const d = document.getElementById('exp-desc').value, a = document.getElementById('exp-amt').value;
-            if(d && a) { expenses.push({desc:d, amount:parseInt(a), date:new Date().toLocaleDateString()}); saveData(); renderExpenses(); document.getElementById('exp-desc').value=''; document.getElementById('exp-amt').value=''; }
-        }
-        function renderExpenses() {
-            const div = document.getElementById('expense-list'); div.innerHTML='';
-            expenses.forEach((e, i) => {
-                div.innerHTML += `<div class="expense-card"><div style="flex:1"><b>${e.desc}</b><div style="font-size:0.8rem;color:#777">${e.date}</div></div><div class="exp-amount">- ₹${e.amount}</div><i class="fa-solid fa-trash exp-del-btn" onclick="deleteExpense(${i})"></i></div>`;
-            });
-        }
-        function deleteExpense(i) {
-            if(confirm("Remove Expense?")) { expenses.splice(i, 1); saveData(); renderExpenses(); }
-        }
-
-        function updateStats() {
-            document.getElementById('total-students').innerText = students.length;
-            document.getElementById('total-rooms').innerText = rooms.length;
-            
-            let income = 0;
-            students.forEach(s => { s.payments.forEach(p => { if(p.month === currentMonth) income += parseInt(s.rent || 0); }); });
-            let expense = expenses.reduce((acc, curr) => acc + curr.amount, 0);
-            
-            document.getElementById('stat-income').innerText = "₹" + income;
-            document.getElementById('stat-expense').innerText = "₹" + expense;
-            document.getElementById('stat-profit').innerText = "₹" + (income - expense);
-        }
-
-        function saveData() {
-            localStorage.setItem('omSaiStudents', JSON.stringify(students));
-            localStorage.setItem('omSaiRooms', JSON.stringify(rooms));
-            localStorage.setItem('omSaiExpenses', JSON.stringify(expenses));
-        }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function downloadBackup() {
-            const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({students, rooms, expenses}));
-            const a = document.createElement('a'); a.href = data; a.download = "hostel_backup.json"; a.click();
-        }
-        function restoreBackup(i) {
-            const r = new FileReader();
-            r.onload = e => { 
-                const d = JSON.parse(e.target.result); 
-                if(d.students) { 
-                    localStorage.setItem('omSaiStudents', JSON.stringify(d.students)); 
-                    localStorage.setItem('omSaiRooms', JSON.stringify(d.rooms)); 
-                    localStorage.setItem('omSaiExpenses', JSON.stringify(d.expenses||[]));
-                    location.reload(); 
+        /* --- 3. Scroll Animations (Intersection Observer) --- */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
                 }
-            };
-            r.readAsText(i.files[0]);
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.scroll-trigger').forEach(el => observer.observe(el));
+
+        /* --- 4. Special Effects (Confetti) --- */
+        document.getElementById('celebrate-btn').addEventListener('click', () => {
+            // Play sound (optional)
+            // const audio = new Audio('pop.mp3'); audio.play();
+
+            // Firework 1
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                
+                // Since particles fall down, start a bit higher than random
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        });
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
         }
-        initAdmin();
+
+        /* --- 5. Lightbox Logic --- */
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+
+        function openLightbox(element) {
+            const img = element.querySelector('img');
+            const title = element.querySelector('h3').innerText;
+            lightboxImg.src = img.src;
+            lightboxCaption.innerText = title;
+            lightbox.classList.remove('hidden');
+            setTimeout(() => {
+                lightbox.classList.remove('opacity-0');
+                lightboxImg.classList.remove('scale-95');
+                lightboxImg.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeLightbox() {
+            lightbox.classList.add('opacity-0');
+            lightboxImg.classList.remove('scale-100');
+            lightboxImg.classList.add('scale-95');
+            setTimeout(() => lightbox.classList.add('hidden'), 300);
+        }
+
+        /* --- 6. Wishes Logic --- */
+        document.getElementById('wish-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('wisher-name').value;
+            const msg = document.getElementById('wisher-msg').value;
+            const container = document.getElementById('wishes-container');
+
+            const card = document.createElement('div');
+            card.className = "p-6 rounded-xl bg-gradient-to-br from-purple-900/20 to-transparent border border-purple-500/30 animate-[slideUp_0.5s_ease-out]";
+            card.innerHTML = `
+                <h4 class="text-gold font-bold mb-1">${name}</h4>
+                <p class="text-gray-300 font-light italic text-sm">"${msg}"</p>
+            `;
+            
+            container.prepend(card);
+            this.reset();
+        });
+
+        /* --- 7. Music Toggle --- */
+        const musicBtn = document.getElementById('music-btn');
+        const audio = document.getElementById('bg-music');
+        let isPlaying = false;
+
+        musicBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                musicBtn.classList.remove('bg-gold', 'text-black');
+                musicBtn.classList.add('bg-white/10', 'text-white');
+            } else {
+                audio.play().catch(e => console.log("Audio play failed interaction required"));
+                musicBtn.classList.add('bg-gold', 'text-black');
+                musicBtn.classList.remove('bg-white/10', 'text-white');
+            }
+            isPlaying = !isPlaying;
+        });
     </script>
 </body>
 </html>
