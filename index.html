@@ -1,551 +1,899 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subrat's Cinematic Birthday</title>
+    <title>AstraBill - Professional Electricity Bill Predictor</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,600;1,600&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts: Plus Jakarta Sans for UI, Outfit for display numbers -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        night: '#050505',
-                        midnight: '#0a0a12',
-                        gold: '#FFD700',
-                        neonPurple: '#b026ff',
-                        glass: 'rgba(255, 255, 255, 0.05)',
-                    },
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                        cinematic: ['Cinzel', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6366f1',    // Indigo 500
+                        primaryHover: '#4f46e5', // Indigo 600
+                        secondary: '#14b8a6',  // Teal 500
+                        dark: '#0b1120',       // Deep professional dark background
+                        card: 'rgba(15, 23, 42, 0.6)'
                     },
                     animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'glow': 'glow 3s ease-in-out infinite alternate',
-                        'reveal': 'reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards',
-                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        },
-                        glow: {
-                            'from': { boxShadow: '0 0 10px rgba(255, 215, 0, 0.1)' },
-                            'to': { boxShadow: '0 0 30px rgba(255, 215, 0, 0.4)' },
-                        },
-                        reveal: {
-                            '0%': { opacity: '0', transform: 'translateY(50px) scale(0.9)' },
-                            '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
-                        },
                         slideUp: {
                             '0%': { opacity: '0', transform: 'translateY(30px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.8', transform: 'scale(1.05)' },
                         }
                     }
                 }
             }
         }
     </script>
+
     <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #FFD700; }
-
-        /* Cinematic Background */
         body {
-            background-color: #050505;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-
-        .cinematic-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
-        }
-
-        /* Snap Scroll for Gallery */
-        .snap-x-mandatory {
-            scroll-snap-type: x mandatory;
-        }
-        .snap-center {
-            scroll-snap-align: center;
-        }
-
-        /* Text Gradients */
-        .text-gradient-gold {
-            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* Loader */
-        #loader {
-            transition: opacity 1s ease-out, visibility 1s ease-out;
+            background-color: #0b1120;
+            background-image: 
+                linear-gradient(to bottom, rgba(11, 17, 32, 0.6), rgba(11, 17, 32, 0.85)),
+                url('https://image2url.com/r2/default/images/1771915675383-ff0d698e-78a8-47ad-809a-48348f10aa6a.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f8fafc;
         }
         
-        /* Lightbox */
-        #lightbox {
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.5);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
-        /* Hide scrollbar for gallery but keep functionality */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        .tab-active {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #818cf8;
+            box-shadow: inset 0 0 12px rgba(99, 102, 241, 0.1);
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
         }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #6366f1;
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+            transition: transform 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #1e293b;
+            border-radius: 2px;
+        }
+        
+        /* Animation Staggers */
+        .stagger-1 { animation-delay: 100ms; }
+        .stagger-2 { animation-delay: 250ms; }
     </style>
 </head>
-<body class="antialiased selection:bg-gold selection:text-black">
+<body class="min-h-screen flex flex-col font-sans antialiased selection:bg-primary selection:text-white overflow-x-hidden">
 
-    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
-    
-    <div id="loader" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center text-center">
-        <div class="relative">
-            <div class="w-24 h-24 border-t-2 border-b-2 border-gold rounded-full animate-spin mb-8 shadow-[0_0_30px_rgba(255,215,0,0.3)]"></div>
-            <div class="absolute inset-0 flex items-center justify-center font-cinematic text-gold text-2xl font-bold animate-pulse">S</div>
-        </div>
-        <h2 class="text-2xl font-cinematic text-white tracking-[0.5em] uppercase animate-pulse">Loading Memories</h2>
-    </div>
-
-    <button id="music-btn" class="fixed bottom-8 right-8 z-40 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-full text-white hover:bg-gold hover:text-black transition-all duration-300 group shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-        <div class="relative">
-            <span class="absolute -inset-2 rounded-full bg-gold/50 opacity-0 group-hover:animate-ping"></span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 18V5l12-2v13"></path>
-                <circle cx="6" cy="18" r="3"></circle>
-                <circle cx="18" cy="16" r="3"></circle>
-            </svg>
-        </div>
-    </button>
-    
-    <audio id="bg-music" loop>
-        <source src="bhai ka badde.mpeg.wav" type="audio/wav">
-        <source src="bhai ka badde.mpeg.wav" type="audio/mpeg">
-    </audio>
-
-    <main class="relative z-10 opacity-0 transition-opacity duration-1000" id="main-content">
-        
-        <section class="min-h-screen flex flex-col items-center justify-center relative px-4 overflow-hidden">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[100px] animate-pulse"></div>
-
-            <div class="text-center relative z-10 max-w-4xl mx-auto space-y-6">
-                <p class="text-gold tracking-[0.5em] uppercase text-sm md:text-base animate-[slideUp_1s_ease-out_0.5s_forwards] opacity-0">Lights. Camera. Memories.</p>
-                
-                <h1 class="text-6xl md:text-8xl lg:text-9xl font-cinematic font-bold leading-tight">
-                    <span class="block text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] animate-[reveal_1.5s_ease-out_0.8s_forwards] opacity-0 translate-y-10">HAPPY</span>
-                    <span class="block text-transparent bg-clip-text bg-gradient-to-r from-gold via-yellow-200 to-gold drop-shadow-[0_0_25px_rgba(255,215,0,0.5)] animate-[reveal_1.5s_ease-out_1s_forwards] opacity-0 translate-y-10">BIRTHDAY</span>
-                    <span class="block text-white font-sans font-light tracking-wider text-4xl md:text-6xl mt-4 animate-[reveal_1.5s_ease-out_1.2s_forwards] opacity-0 translate-y-10">SUBRAT</span>
-                </h1>
-
-                <div class="h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent mx-auto my-8"></div>
-
-                <p class="text-gray-300 text-lg md:text-xl font-light italic max-w-2xl mx-auto animate-[slideUp_1s_ease-out_1.5s_forwards] opacity-0">
-                    "A special day for a special brother. Here is to your journey, your memories, and your future."
-                </p>
-
-                <div class="pt-8 animate-[slideUp_1s_ease-out_1.8s_forwards] opacity-0">
-                    <a href="#gallery" class="group relative inline-flex items-center gap-3 px-8 py-4 bg-transparent overflow-hidden rounded-full border border-gold/30 hover:border-gold transition-all duration-500">
-                        <div class="absolute inset-0 w-0 bg-gold transition-all duration-[250ms] ease-out group-hover:w-full opacity-10"></div>
-                        <span class="relative text-gold group-hover:text-white tracking-widest uppercase text-sm font-bold">Enter The Memories</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                        </svg>
-                    </a>
-                </div>
+    <!-- Navbar -->
+    <nav class="glass-panel sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-white/5 animate-fade-in">
+        <div class="flex items-center gap-3 cursor-pointer group">
+            <div class="relative flex items-center justify-center h-12 w-12 transition-transform duration-500 group-hover:scale-105">
+                <img src="https://image2url.com/r2/default/images/1771915610959-238c3438-12b8-4c4e-81af-9add6c768516.png" alt="AstraBill Logo" class="h-full w-full object-cover rounded-full z-10 shadow-[0_0_20px_rgba(99,102,241,0.7)] border border-primary/50" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236366f1\'%3E%3Cpath d=\'M13 2L3 14h9l-1 8 10-12h-9l1-8z\'/%3E%3C/svg%3E';">
+                <div class="absolute inset-0 bg-primary/40 blur-xl rounded-full animate-pulse-glow"></div>
             </div>
-        </section>
+            <h1 class="text-2xl font-display font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">AstraBill</h1>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
+            </span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-300 hidden sm:inline-block">Live Predictor</span>
+        </div>
+    </nav>
 
-        <section id="gallery" class="py-24 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-black to-transparent z-10"></div>
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <div class="container mx-auto px-6 mb-12 flex items-end justify-between">
-                <div>
-                    <h2 class="text-4xl md:text-6xl font-cinematic text-white mb-2">Memory Reel</h2>
-                    <div class="h-1 w-20 bg-gold"></div>
-                </div>
-                <p class="hidden md:block text-gray-400 text-sm tracking-widest uppercase">Swipe to explore →</p>
-            </div>
-
-            <div class="flex overflow-x-auto snap-x-mandatory no-scrollbar pb-12 px-6 gap-6 md:gap-10">
+            <!-- Left Column: Inputs & Controls -->
+            <div class="lg:col-span-7 flex flex-col gap-6 opacity-0 animate-slide-up stagger-1">
                 
-                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
-                    <img src="https://image2url.com/r2/default/images/1771309046964-30aa8fc5-01e6-4feb-a7bf-95841def4090.jpeg" alt="Style Icon" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100 object-top">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
-                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">The Look</span>
-                        <h3 class="text-3xl font-cinematic text-white">Main Character Energy</h3>
-                    </div>
+                <!-- Tabs -->
+                <div class="glass-panel rounded-2xl p-2 flex overflow-x-auto hide-scrollbar gap-2 relative z-10">
+                    <button onclick="switchTab('meter')" id="tab-meter" class="flex-1 py-3.5 px-4 text-sm font-semibold rounded-xl transition-all duration-300 tab-active flex items-center justify-center gap-2 hover:bg-white/5">
+                        <i class="fa-solid fa-gauge-high"></i> Meter Reading
+                    </button>
+                    <button onclick="switchTab('appliance')" id="tab-appliance" class="flex-1 py-3.5 px-4 text-sm font-medium rounded-xl transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5 border border-transparent flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-microchip"></i> Smart Devices
+                    </button>
+                    <button onclick="switchTab('tariff')" id="tab-tariff" class="flex-1 py-3.5 px-4 text-sm font-medium rounded-xl transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5 border border-transparent flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> Tariff Settings
+                    </button>
                 </div>
 
-                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
-                    <img src="https://image2url.com/r2/default/images/1771309209887-f1a347fa-46fe-4494-9d0f-2004454257ad.jpeg" alt="Adventure" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
-                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Explore</span>
-                        <h3 class="text-3xl font-cinematic text-white">The Traveller</h3>
-                    </div>
-                </div>
-
-                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
-                    <img src="https://image2url.com/r2/default/images/1771309269428-e7ac7882-f84e-47b7-9817-870bd59ef0f2.jpeg" alt="Sunset" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
-                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Vibes</span>
-                        <h3 class="text-3xl font-cinematic text-white">Golden Moments</h3>
-                    </div>
-                </div>
-
-                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
-                    <img src="https://image2url.com/r2/default/images/1771309331385-950c1717-f298-4cc9-96c9-11f342ceeeb0.jpeg" alt="Cliff View" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
-                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Brotherhood</span>
-                        <h3 class="text-3xl font-cinematic text-white">Day One Homies</h3>
-                    </div>
-                </div>
-
-                <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
-                    <img src="https://image2url.com/r2/default/images/1771309388916-c05474fe-d30e-4625-80bf-2a4827922d43.jpeg" alt="Scenic" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
-                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Vision</span>
-                        <h3 class="text-3xl font-cinematic text-white">Scenic Views</h3>
-                    </div>
-                </div>
-
-                 <div class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[500px] relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-gold/50 hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]" onclick="openLightbox(this)">
-                    <img src="https://image2url.com/r2/default/images/1771309440014-e65214be-4853-4f38-b8f6-6d42ef9cb133.jpeg" alt="Smile" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
-                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <span class="text-gold text-xs tracking-[0.2em] uppercase mb-2 block">Joy</span>
-                        <h3 class="text-3xl font-cinematic text-white">Always Smiling</h3>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <section class="py-24 relative px-6">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-4xl md:text-5xl font-cinematic text-center mb-16 scroll-trigger opacity-0 translate-y-10 transition-all duration-700">Subrat's Journey</h2>
-                
-                <div class="relative border-l-2 border-white/10 ml-4 md:ml-1/2 space-y-12 md:space-y-24">
+                <!-- Tab Content: Meter Reading -->
+                <div id="content-meter" class="glass-panel rounded-3xl p-8 transition-all duration-500">
+                    <h2 class="text-xl font-display font-semibold mb-2 flex items-center gap-3">
+                        <div class="p-2 bg-primary/10 rounded-lg text-primary"><i class="fa-solid fa-calculator"></i></div> Quick Calculator
+                    </h2>
+                    <p class="text-sm text-slate-400 mb-8">Enter your previous and current electricity meter readings to accurately calculate your estimated bill.</p>
                     
-                    <div class="relative pl-8 md:pl-0 scroll-trigger opacity-0 translate-y-10 transition-all duration-700 delay-100">
-                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gold shadow-[0_0_10px_rgba(255,215,0,0.8)]"></div>
-                        <div class="md:flex md:justify-between md:items-center w-full">
-                            <div class="md:w-[45%] md:text-right md:pr-12 mb-2 md:mb-0 order-1">
-                                <span class="text-gold font-bold text-xl font-cinematic">17 Feb, 2000</span>
-                                <h3 class="text-white text-2xl font-bold">The Beginning</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 group-focus-within:text-primary transition-colors">Previous Reading (kWh)</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-bolt absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors"></i>
+                                <input type="number" id="prev-reading" placeholder="e.g., 14500" class="w-full bg-slate-900/60 border border-slate-700/50 rounded-xl pl-10 pr-4 py-4 text-white font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-slate-900 transition-all shadow-inner" oninput="calculateFromMeter()">
                             </div>
-                            <div class="md:w-[45%] md:pl-12 order-2">
-                                <p class="text-gray-400 font-light">A legend was born. The day the world became a brighter place.</p>
+                        </div>
+                        <div class="group">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 group-focus-within:text-primary transition-colors">Current Reading (kWh)</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-bolt absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors"></i>
+                                <input type="number" id="curr-reading" placeholder="e.g., 14850" class="w-full bg-slate-900/60 border border-slate-700/50 rounded-xl pl-10 pr-4 py-4 text-white font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-slate-900 transition-all shadow-inner" oninput="calculateFromMeter()">
                             </div>
                         </div>
                     </div>
 
-                    <div class="relative pl-8 md:pl-0 scroll-trigger opacity-0 translate-y-10 transition-all duration-700 delay-100">
-                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]"></div>
-                        <div class="md:flex md:justify-between md:items-center w-full">
-                            <div class="md:w-[45%] md:text-right md:pr-12 mb-2 md:mb-0 md:order-2">
-                                <p class="text-gray-400 font-light">From backyard cricket to school debates, you always stood out.</p>
-                            </div>
-                            <div class="md:w-[45%] md:pl-12 md:order-1">
-                                <span class="text-purple-400 font-bold text-xl font-cinematic">2012</span>
-                                <h3 class="text-white text-2xl font-bold">Childhood Memories</h3>
-                            </div>
+                    <div class="mt-8 p-6 bg-gradient-to-r from-slate-800/30 to-slate-900/50 rounded-2xl border border-white/5 flex items-center justify-between group hover:border-white/10 transition-colors">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Units Consumed</p>
+                            <p class="text-4xl font-display font-bold text-white mt-2 flex items-baseline gap-1">
+                                <span id="meter-units-display">0.0</span> 
+                                <span class="text-base text-slate-500 font-medium tracking-wide">kWh</span>
+                            </p>
+                        </div>
+                        <div class="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] group-hover:scale-105 transition-transform duration-500">
+                            <i class="fa-solid fa-bolt-lightning text-primary text-2xl"></i>
                         </div>
                     </div>
-
-                    <div class="relative pl-8 md:pl-0 scroll-trigger opacity-0 translate-y-10 transition-all duration-700 delay-100">
-                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gold shadow-[0_0_10px_rgba(255,215,0,0.8)]"></div>
-                        <div class="md:flex md:justify-between md:items-center w-full">
-                            <div class="md:w-[45%] md:text-right md:pr-12 mb-2 md:mb-0 order-1">
-                                <span class="text-gold font-bold text-xl font-cinematic">2023</span>
-                                <h3 class="text-white text-2xl font-bold">Big Achievements</h3>
-                            </div>
-                            <div class="md:w-[45%] md:pl-12 order-2">
-                                <p class="text-gray-400 font-light">Graduation, first job, or that big win. You made us all proud.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="relative pl-8 md:pl-0 scroll-trigger opacity-0 translate-y-10 transition-all duration-700 delay-100">
-                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
-                        <div class="md:flex md:justify-between md:items-center w-full">
-                            <div class="md:w-[45%] md:text-right md:pr-12 mb-2 md:mb-0 md:order-2">
-                                <p class="text-gray-400 font-light">The sky is the limit. Keep chasing your dreams, brother.</p>
-                            </div>
-                            <div class="md:w-[45%] md:pl-12 md:order-1">
-                                <span class="text-blue-400 font-bold text-xl font-cinematic">Future</span>
-                                <h3 class="text-white text-2xl font-bold">Next Chapter</h3>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-            </div>
-        </section>
 
-        <section class="py-24 px-6 flex justify-center">
-            <div class="max-w-2xl w-full relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-gold via-purple-500 to-blue-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                <!-- Tab Content: Smart Appliances -->
+                <div id="content-appliance" class="glass-panel rounded-3xl p-8 hidden transition-all duration-500 opacity-0 translate-y-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-semibold flex items-center gap-3">
+                            <div class="p-2 bg-secondary/10 rounded-lg text-secondary"><i class="fa-solid fa-microchip"></i></div> Device Predictor
+                        </h2>
+                        <button onclick="openAddApplianceModal()" class="bg-gradient-to-r from-primary to-primaryHover text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5">
+                            <i class="fa-solid fa-plus"></i> Add Device
+                        </button>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-8">Build your household profile to estimate future consumption based on daily usage patterns.</p>
+
+                    <!-- Appliance List -->
+                    <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 hide-scrollbar" id="appliance-list">
+                        <!-- Dynamic content populated by JS -->
+                    </div>
+
+                    <div class="mt-6 p-6 bg-gradient-to-r from-slate-800/30 to-slate-900/50 rounded-2xl border border-white/5 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Estimated Monthly Load</p>
+                            <p class="text-3xl font-display font-bold text-white mt-2 flex items-baseline gap-1">
+                                <span id="appliance-units-display">0.0</span> 
+                                <span class="text-base text-slate-500 font-medium tracking-wide">kWh</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Tariff Settings -->
+                <div id="content-tariff" class="glass-panel rounded-3xl p-8 hidden transition-all duration-500 opacity-0 translate-y-4">
+                    <h2 class="text-xl font-display font-semibold mb-2 flex items-center gap-3">
+                        <div class="p-2 bg-amber-500/10 rounded-lg text-amber-500"><i class="fa-solid fa-sliders"></i></div> Tariff Configuration
+                    </h2>
+                    <p class="text-sm text-slate-400 mb-8">Configure exact billing parameters and pricing slabs corresponding to your local provider.</p>
+
+                    <div class="space-y-8">
+                        <!-- Slabs -->
+                        <div>
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300">Pricing Slabs (₹/kWh)</label>
+                                <button onclick="addSlab()" class="text-sm font-semibold text-primary hover:text-primaryHover transition-colors flex items-center gap-1"><i class="fa-solid fa-circle-plus"></i> Add Slab</button>
+                            </div>
+                            <div id="slabs-container" class="space-y-3">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <hr class="border-white/5">
+
+                        <!-- Fixed Charges & Tax -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="group">
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 group-focus-within:text-primary transition-colors">Monthly Fixed Charge (₹)</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">₹</span>
+                                    <input type="number" id="fixed-charge" value="150" class="w-full bg-slate-900/60 border border-slate-700/50 rounded-xl pl-8 pr-4 py-4 text-white font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-slate-900 transition-all shadow-inner" oninput="saveTariffSettings()">
+                                </div>
+                            </div>
+                            <div class="group">
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 group-focus-within:text-primary transition-colors">Electricity Duty / Tax (%)</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-percent absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                                    <input type="number" id="tax-rate" value="5" class="w-full bg-slate-900/60 border border-slate-700/50 rounded-xl pl-10 pr-4 py-4 text-white font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-slate-900 transition-all shadow-inner" oninput="saveTariffSettings()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Results & Analytics -->
+            <div class="lg:col-span-5 flex flex-col gap-6 opacity-0 animate-slide-up stagger-2">
                 
-                <div class="relative p-10 bg-black border border-white/10 rounded-2xl backdrop-blur-xl">
-                    <div class="absolute top-0 right-0 p-6 opacity-20">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 7.55228 14.017 7V6C14.017 5.44772 14.4647 5 15.017 5H19.017C20.6739 5 22.017 6.34315 22.017 8V15C22.017 18.3137 19.3307 21 16.017 21H14.017ZM3.017 21L3.017 18C3.017 16.8954 3.91243 16 5.017 16H8.017C8.56928 16 9.017 15.5523 9.017 15V9C9.017 8.44772 8.56928 8 8.017 8H4.017C3.46472 8 3.017 7.55228 3.017 7V6C3.017 5.44772 3.46472 5 4.017 5H8.017C9.67386 5 11.017 6.34315 11.017 8V15C11.017 18.3137 8.33071 21 5.017 21H3.017Z" /></svg>
-                    </div>
+                <!-- Bill Summary Card -->
+                <div class="glass-panel rounded-3xl p-8 relative overflow-hidden group hover:shadow-[0_8px_40px_rgba(99,102,241,0.12)] transition-all duration-500 border-t border-white/10">
+                    <!-- Background aesthetic blur -->
+                    <div class="absolute -top-32 -right-32 w-80 h-80 rounded-full bg-primary/20 blur-[80px] group-hover:bg-primary/30 transition-colors duration-700 pointer-events-none"></div>
+                    <div class="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-secondary/10 blur-[80px] group-hover:bg-secondary/20 transition-colors duration-700 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-6">
+                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                                <i class="fa-solid fa-file-invoice text-primary"></i> Estimated Bill
+                            </h3>
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-semibold tracking-widest text-slate-300">THIS MONTH</span>
+                        </div>
+                        
+                        <div class="flex items-baseline gap-2 mb-8 border-b border-white/5 pb-8">
+                            <span class="text-3xl font-semibold text-slate-400">₹</span>
+                            <span class="text-6xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-100 to-slate-400 tracking-tight" id="total-bill">0.00</span>
+                        </div>
 
-                    <h2 class="text-3xl font-cinematic text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-6">Dear Subrat,</h2>
-                    <p class="text-xl font-light leading-relaxed text-gray-300 mb-6">
-                        You are not just my brother, you are my strength and my inspiration. May your life always be filled with happiness, success, peace, and love. Thank you for being the amazing person you are.
-                    </p>
-                    <p class="text-gold font-handwriting text-2xl font-bold">Happy Birthday ❤️</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-20 text-center">
-            <button id="celebrate-btn" class="group relative px-10 py-5 bg-transparent rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95">
-                <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-20 group-hover:opacity-100 transition-opacity duration-500 blur-lg"></div>
-                <div class="absolute inset-0 border border-white/20 rounded-full"></div>
-                <span class="relative z-10 flex items-center gap-3 text-xl font-bold text-white tracking-widest uppercase">
-                    <span>✨ Celebration Mode</span>
-                </span>
-            </button>
-            <p class="text-gray-500 text-sm mt-4">Tap for a surprise!</p>
-        </section>
-
-        <section class="py-24 px-6 bg-black/50 backdrop-blur-sm">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-4xl font-cinematic text-center mb-12 text-white">Write a Wish ✍️</h2>
-                
-                <div class="grid md:grid-cols-2 gap-12">
-                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10">
-                        <form id="wish-form" class="space-y-6">
-                            <div>
-                                <label class="block text-gray-400 text-xs uppercase tracking-widest mb-2">Your Name</label>
-                                <input type="text" id="wisher-name" required class="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white focus:outline-none focus:border-gold focus:shadow-[0_0_10px_rgba(255,215,0,0.2)] transition-all">
+                        <div class="space-y-3 text-sm font-medium">
+                            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-white/5 transition-colors">
+                                <span class="text-slate-400 flex items-center gap-3"><div class="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_8px_rgba(99,102,241,0.8)]"></div> Energy Charges (<span id="summary-units">0</span> kWh)</span>
+                                <span class="text-white text-base tracking-wide" id="summary-energy-charge">₹0.00</span>
                             </div>
-                            <div>
-                                <label class="block text-gray-400 text-xs uppercase tracking-widest mb-2">Your Wish</label>
-                                <textarea id="wisher-msg" rows="4" required class="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white focus:outline-none focus:border-gold focus:shadow-[0_0_10px_rgba(255,215,0,0.2)] transition-all"></textarea>
+                            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-white/5 transition-colors">
+                                <span class="text-slate-400 flex items-center gap-3"><div class="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]"></div> Fixed Charges</span>
+                                <span class="text-white text-base tracking-wide" id="summary-fixed-charge">₹0.00</span>
                             </div>
-                            <button type="submit" class="w-full bg-gold text-black font-bold py-3 rounded-lg hover:bg-yellow-400 transition-colors shadow-lg">Send Wish 🚀</button>
-                        </form>
-                    </div>
-
-                    <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar" id="wishes-container">
-                        <div class="p-6 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/5 hover:border-white/20 transition-all">
-                            <h4 class="text-gold font-bold mb-1">Mom & Dad</h4>
-                            <p class="text-gray-300 font-light italic text-sm">"We love you so much son. Proud of you!"</p>
+                            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-white/5 transition-colors">
+                                <span class="text-slate-400 flex items-center gap-3"><div class="w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(20,184,166,0.8)]"></div> Taxes & Duty (<span id="summary-tax-percent">0</span>%)</span>
+                                <span class="text-white text-base tracking-wide" id="summary-tax-amount">₹0.00</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <footer class="py-12 text-center border-t border-white/5">
-            <p class="text-gray-500 font-light tracking-widest uppercase text-sm">
-                Made with <span class="text-red-500 animate-pulse">❤️</span> for Subrat
-            </p>
-        </footer>
+                <!-- Chart: Cost Breakdown -->
+                <div class="glass-panel rounded-3xl p-6 hover:border-white/10 transition-colors duration-300">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-slate-400"></i> Cost Breakdown
+                    </h3>
+                    <div class="h-56 relative flex justify-center">
+                        <canvas id="costBreakdownChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart: Appliance Usage (Only visible in appliance mode) -->
+                <div id="appliance-chart-container" class="glass-panel rounded-3xl p-6 hidden hover:border-white/10 transition-colors duration-300">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-column text-slate-400"></i> Consumption by Device
+                    </h3>
+                    <div class="h-56 relative">
+                        <canvas id="applianceUsageChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </main>
 
-    <div id="lightbox" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 p-4 transition-opacity duration-300 opacity-0" onclick="closeLightbox()">
-        <button class="absolute top-6 right-6 text-white text-4xl hover:text-gold">&times;</button>
-        <img id="lightbox-img" src="" class="max-w-full max-h-[90vh] rounded-lg shadow-[0_0_50px_rgba(255,255,255,0.1)] transform scale-95 transition-transform duration-300">
-        <div class="absolute bottom-8 left-0 w-full text-center">
-            <h3 id="lightbox-caption" class="text-2xl font-cinematic text-white drop-shadow-lg"></h3>
+    <!-- Modal: Add Appliance -->
+    <div id="add-appliance-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="glass-panel bg-slate-900/90 rounded-3xl p-8 w-full max-w-md border border-white/10 relative shadow-2xl transform scale-95 transition-all duration-300 translate-y-4" id="modal-content">
+            <button onclick="closeAddApplianceModal()" class="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <h3 class="text-2xl font-display font-bold text-white mb-6">Add Device</h3>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Quick Presets</label>
+                    <div class="grid grid-cols-4 gap-3 mb-5">
+                        <button type="button" onclick="selectPreset('ac')" class="preset-btn p-3 rounded-2xl bg-slate-800/50 border border-white/5 hover:border-primary hover:bg-primary/5 flex flex-col items-center gap-2 transition-all duration-300 hover:-translate-y-1">
+                            <i class="fa-solid fa-snowflake text-primary text-xl"></i>
+                            <span class="text-[10px] font-semibold text-slate-300 uppercase tracking-wider">AC</span>
+                        </button>
+                        <button type="button" onclick="selectPreset('fridge')" class="preset-btn p-3 rounded-2xl bg-slate-800/50 border border-white/5 hover:border-primary hover:bg-primary/5 flex flex-col items-center gap-2 transition-all duration-300 hover:-translate-y-1">
+                            <i class="fa-solid fa-icicles text-blue-400 text-xl"></i>
+                            <span class="text-[10px] font-semibold text-slate-300 uppercase tracking-wider">Fridge</span>
+                        </button>
+                        <button type="button" onclick="selectPreset('tv')" class="preset-btn p-3 rounded-2xl bg-slate-800/50 border border-white/5 hover:border-primary hover:bg-primary/5 flex flex-col items-center gap-2 transition-all duration-300 hover:-translate-y-1">
+                            <i class="fa-solid fa-tv text-purple-400 text-xl"></i>
+                            <span class="text-[10px] font-semibold text-slate-300 uppercase tracking-wider">TV</span>
+                        </button>
+                        <button type="button" onclick="selectPreset('fan')" class="preset-btn p-3 rounded-2xl bg-slate-800/50 border border-white/5 hover:border-primary hover:bg-primary/5 flex flex-col items-center gap-2 transition-all duration-300 hover:-translate-y-1">
+                            <i class="fa-solid fa-fan text-slate-300 text-xl"></i>
+                            <span class="text-[10px] font-semibold text-slate-300 uppercase tracking-wider">Fan</span>
+                        </button>
+                    </div>
+                    
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Device Name</label>
+                    <input type="text" id="new-app-name" placeholder="e.g., Gaming PC" class="w-full bg-slate-900/60 border border-slate-700/50 rounded-xl px-4 py-3.5 text-white font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-slate-900 transition-all">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Power (Watts)</label>
+                        <input type="number" id="new-app-power" placeholder="1500" class="w-full bg-slate-900/60 border border-slate-700/50 rounded-xl px-4 py-3.5 text-white font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-slate-900 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Quantity</label>
+                        <input type="number" id="new-app-qty" value="1" min="1" class="w-full bg-slate-900/60 border border-slate-700/50 rounded-xl px-4 py-3.5 text-white font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-slate-900 transition-all">
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <label class="flex justify-between items-center text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">
+                        <span>Daily Usage</span>
+                        <span class="text-primary bg-primary/10 px-3 py-1 rounded-full"><span id="modal-hours-display" class="font-bold text-sm">8</span> Hours</span>
+                    </label>
+                    <input type="range" id="new-app-hours" min="0" max="24" step="0.5" value="8" oninput="document.getElementById('modal-hours-display').innerText = this.value">
+                </div>
+
+                <button onclick="addAppliance()" class="w-full bg-gradient-to-r from-primary to-primaryHover hover:from-primaryHover hover:to-indigo-700 text-white font-semibold py-4 rounded-xl transition-all duration-300 mt-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 transform hover:-translate-y-0.5 flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-check"></i> Save Device
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- JavaScript Logic -->
     <script>
-        /* --- 1. Loader Logic --- */
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('loader');
-            const main = document.getElementById('main-content');
+        // --- State Management ---
+        let currentMode = 'meter';
+        let totalUnits = 0;
+        let billDetails = { energyCharge: 0, fixedCharge: 0, taxAmount: 0, total: 0 };
+        let previousBillDetails = { energyCharge: 0, fixedCharge: 0, taxAmount: 0, total: 0 };
+        let previousTotalUnits = 0;
+        
+        let costChartInstance = null;
+        let usageChartInstance = null;
+
+        // Default Tariff Slabs
+        let tariffSlabs = [
+            { id: 1, limit: 100, rate: 3.50 },
+            { id: 2, limit: 200, rate: 5.00 },
+            { id: 3, limit: 500, rate: 7.50 },
+            { id: 4, limit: 999999, rate: 10.00 }
+        ];
+        let fixedCharge = 150;
+        let taxRate = 5;
+
+        // Appliance Data
+        let appliances = [
+            { id: 1, name: 'Air Conditioner', power: 1500, qty: 1, hours: 8, icon: 'fa-snowflake', color: '#6366f1' },
+            { id: 2, name: 'Refrigerator', power: 250, qty: 1, hours: 24, icon: 'fa-icicles', color: '#14b8a6' },
+            { id: 3, name: 'Ceiling Fan', power: 75, qty: 3, hours: 12, icon: 'fa-fan', color: '#94a3b8' },
+            { id: 4, name: 'LED TV', power: 100, qty: 1, hours: 5, icon: 'fa-tv', color: '#a855f7' }
+        ];
+
+        const presetAppliances = {
+            'ac': { name: 'Air Conditioner', power: 1500, icon: 'fa-snowflake', color: '#6366f1' },
+            'fridge': { name: 'Refrigerator', power: 250, icon: 'fa-icicles', color: '#14b8a6' },
+            'tv': { name: 'Television', power: 100, icon: 'fa-tv', color: '#a855f7' },
+            'fan': { name: 'Ceiling Fan', power: 75, icon: 'fa-fan', color: '#94a3b8' },
+            'washing_machine': { name: 'Washing Machine', power: 500, icon: 'fa-shirt', color: '#10b981' },
+            'heater': { name: 'Water Heater', power: 2000, icon: 'fa-fire', color: '#ef4444' },
+            'bulb': { name: 'LED Bulb', power: 15, icon: 'fa-lightbulb', color: '#eab308' }
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTariffSettings();
+            renderApplianceList();
+            initCharts();
+            calculateFromMeter(); 
+        });
+
+        // --- Smooth Number Animation ---
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            if(!obj) return;
             
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                loader.style.visibility = 'hidden';
-                main.style.opacity = '1';
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                // easeOutQuart
+                const ease = 1 - Math.pow(1 - progress, 4);
+                const current = start + (end - start) * ease;
                 
-                // Trigger particles after load
-                initParticles();
-            }, 2500); // 2.5s cinematic intro time
-        });
-
-        /* --- 2. Canvas Particles System --- */
-        function initParticles() {
-            const canvas = document.getElementById('bg-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const particles = [];
-            const particleCount = 70; // Optimized for performance
-
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 2;
-                    this.speedX = (Math.random() - 0.5) * 0.2;
-                    this.speedY = (Math.random() - 0.5) * 0.2;
-                    this.opacity = Math.random() * 0.5;
-                }
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-                }
-                draw() {
-                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
-
-            function animateParticles() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    p.update();
-                    p.draw();
-                });
-                requestAnimationFrame(animateParticles);
-            }
-            animateParticles();
-
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-        }
-
-        /* --- 3. Scroll Animations (Intersection Observer) --- */
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.remove('opacity-0', 'translate-y-10');
-                    entry.target.classList.add('opacity-100', 'translate-y-0');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.scroll-trigger').forEach(el => observer.observe(el));
-
-        /* --- 4. Special Effects (Confetti) --- */
-        document.getElementById('celebrate-btn').addEventListener('click', () => {
-            // Play sound (optional)
-            // const audio = new Audio('pop.mp3'); audio.play();
-
-            // Firework 1
-            var duration = 3 * 1000;
-            var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-            var interval = setInterval(function() {
-                var timeLeft = animationEnd - Date.now();
-
-                if (timeLeft <= 0) {
-                    return clearInterval(interval);
-                }
-
-                var particleCount = 50 * (timeLeft / duration);
+                if(id === 'total-bill') obj.innerText = current.toFixed(2);
+                else if(id === 'summary-units' || id.includes('units-display')) obj.innerText = current.toFixed(1);
+                else obj.innerText = '₹' + current.toFixed(2);
                 
-                // Since particles fall down, start a bit higher than random
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
-        });
-
-        function randomInRange(min, max) {
-            return Math.random() * (max - min) + min;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    if(id === 'total-bill') obj.innerText = end.toFixed(2);
+                    else if(id === 'summary-units' || id.includes('units-display')) obj.innerText = end.toFixed(1);
+                    else obj.innerText = '₹' + end.toFixed(2);
+                }
+            };
+            window.requestAnimationFrame(step);
         }
 
-        /* --- 5. Lightbox Logic --- */
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
-        const lightboxCaption = document.getElementById('lightbox-caption');
-
-        function openLightbox(element) {
-            const img = element.querySelector('img');
-            const title = element.querySelector('h3').innerText;
-            lightboxImg.src = img.src;
-            lightboxCaption.innerText = title;
-            lightbox.classList.remove('hidden');
-            setTimeout(() => {
-                lightbox.classList.remove('opacity-0');
-                lightboxImg.classList.remove('scale-95');
-                lightboxImg.classList.add('scale-100');
-            }, 10);
-        }
-
-        function closeLightbox() {
-            lightbox.classList.add('opacity-0');
-            lightboxImg.classList.remove('scale-100');
-            lightboxImg.classList.add('scale-95');
-            setTimeout(() => lightbox.classList.add('hidden'), 300);
-        }
-
-        /* --- 6. Wishes Logic --- */
-        document.getElementById('wish-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('wisher-name').value;
-            const msg = document.getElementById('wisher-msg').value;
-            const container = document.getElementById('wishes-container');
-
-            const card = document.createElement('div');
-            card.className = "p-6 rounded-xl bg-gradient-to-br from-purple-900/20 to-transparent border border-purple-500/30 animate-[slideUp_0.5s_ease-out]";
-            card.innerHTML = `
-                <h4 class="text-gold font-bold mb-1">${name}</h4>
-                <p class="text-gray-300 font-light italic text-sm">"${msg}"</p>
-            `;
+        // --- UI Navigation ---
+        function switchTab(tabId) {
+            currentMode = tabId === 'tariff' ? currentMode : tabId; 
             
-            container.prepend(card);
-            this.reset();
-        });
+            // Reset tabs
+            ['meter', 'appliance', 'tariff'].forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-slate-400', 'border-transparent');
+                
+                const content = document.getElementById(`content-${id}`);
+                content.classList.add('hidden', 'opacity-0', 'translate-y-4');
+                content.classList.remove('opacity-100', 'translate-y-0');
+            });
 
-        /* --- 7. Music Toggle --- */
-        const musicBtn = document.getElementById('music-btn');
-        const audio = document.getElementById('bg-music');
-        let isPlaying = false;
+            // Activate target
+            const targetBtn = document.getElementById(`tab-${tabId}`);
+            targetBtn.classList.add('tab-active');
+            targetBtn.classList.remove('text-slate-400', 'border-transparent');
+            
+            const targetContent = document.getElementById(`content-${tabId}`);
+            targetContent.classList.remove('hidden');
+            
+            // Allow block display to compute before sliding in
+            setTimeout(() => {
+                targetContent.classList.remove('opacity-0', 'translate-y-4');
+                targetContent.classList.add('opacity-100', 'translate-y-0');
+            }, 20);
 
-        musicBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                audio.pause();
-                musicBtn.classList.remove('bg-gold', 'text-black');
-                musicBtn.classList.add('bg-white/10', 'text-white');
+            if (tabId === 'appliance') {
+                document.getElementById('appliance-chart-container').classList.remove('hidden');
+                calculateFromAppliances();
+            } else if (tabId === 'meter') {
+                document.getElementById('appliance-chart-container').classList.add('hidden');
+                calculateFromMeter();
+            } else if (tabId === 'tariff') {
+                if(currentMode === 'meter') calculateFromMeter();
+                else calculateFromAppliances();
+            }
+        }
+
+        // --- Core Calculation Logic ---
+        function calculateBill(units) {
+            let remainingUnits = units;
+            let energyCharge = 0;
+            let previousLimit = 0;
+
+            let sortedSlabs = [...tariffSlabs].sort((a, b) => a.limit - b.limit);
+
+            for (let i = 0; i < sortedSlabs.length; i++) {
+                let slab = sortedSlabs[i];
+                let slabSize = slab.limit - previousLimit;
+                
+                if (remainingUnits > slabSize) {
+                    energyCharge += slabSize * slab.rate;
+                    remainingUnits -= slabSize;
+                } else {
+                    energyCharge += remainingUnits * slab.rate;
+                    break;
+                }
+                previousLimit = slab.limit;
+            }
+
+            let tax = (energyCharge + fixedCharge) * (taxRate / 100);
+            let total = energyCharge + fixedCharge + tax;
+
+            return { energyCharge, fixedCharge, taxAmount: tax, total };
+        }
+
+        function updateSummaryUI() {
+            // Animate Summary Card
+            animateValue('total-bill', previousBillDetails.total, billDetails.total, 1000);
+            animateValue('summary-energy-charge', previousBillDetails.energyCharge, billDetails.energyCharge, 800);
+            animateValue('summary-fixed-charge', previousBillDetails.fixedCharge, billDetails.fixedCharge, 800);
+            animateValue('summary-tax-amount', previousBillDetails.taxAmount, billDetails.taxAmount, 800);
+            animateValue('summary-units', previousTotalUnits, totalUnits, 800);
+            
+            document.getElementById('summary-tax-percent').innerText = taxRate;
+
+            // Animate Tab specific unit displays
+            if(currentMode === 'meter') {
+                animateValue('meter-units-display', previousTotalUnits, totalUnits, 800);
             } else {
-                audio.play().catch(e => console.log("Audio play failed interaction required"));
-                musicBtn.classList.add('bg-gold', 'text-black');
-                musicBtn.classList.remove('bg-white/10', 'text-white');
+                animateValue('appliance-units-display', previousTotalUnits, totalUnits, 800);
             }
-            isPlaying = !isPlaying;
-        });
+            
+            previousBillDetails = { ...billDetails };
+            previousTotalUnits = totalUnits;
+            
+            updateCharts();
+        }
+
+        function calculateFromMeter() {
+            if(currentMode !== 'meter') return;
+            let prev = parseFloat(document.getElementById('prev-reading').value) || 0;
+            let curr = parseFloat(document.getElementById('curr-reading').value) || 0;
+            totalUnits = Math.max(0, curr - prev);
+            billDetails = calculateBill(totalUnits);
+            updateSummaryUI();
+        }
+
+        function calculateFromAppliances() {
+            if(currentMode !== 'appliance') return;
+            let monthlyUnits = 0;
+            appliances.forEach(app => {
+                let dailyKwh = (app.power * app.hours * app.qty) / 1000;
+                let monthly = dailyKwh * 30;
+                app.monthlyConsumption = monthly; 
+                monthlyUnits += monthly;
+            });
+
+            totalUnits = monthlyUnits;
+            billDetails = calculateBill(totalUnits);
+            updateSummaryUI();
+        }
+
+        // --- Appliances List Render ---
+        function renderApplianceList() {
+            const container = document.getElementById('appliance-list');
+            container.innerHTML = '';
+            
+            if(appliances.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 bg-slate-800/20 rounded-2xl border border-dashed border-white/10 text-slate-500 text-sm">No devices added. Add devices to predict bill.</div>`;
+                return;
+            }
+
+            appliances.forEach(app => {
+                let monthlyKwh = ((app.power * app.hours * app.qty) / 1000) * 30;
+                container.innerHTML += `
+                    <div class="bg-slate-800/40 border border-white/5 p-4 rounded-2xl flex items-center gap-4 group hover:border-white/10 hover:bg-slate-800/60 transition-all duration-300 hover:-translate-y-1">
+                        <div class="h-12 w-12 rounded-xl bg-slate-900/80 flex items-center justify-center shrink-0 border border-white/5 shadow-inner">
+                            <i class="fa-solid ${app.icon} text-lg" style="color: ${app.color}"></i>
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <div class="flex justify-between items-start mb-1.5">
+                                <h4 class="text-sm font-semibold text-white truncate pr-2">${app.name}</h4>
+                                <button onclick="removeAppliance(${app.id})" class="text-slate-500 hover:text-red-400 transition-colors shrink-0">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                            <div class="text-[11px] font-medium text-slate-400 flex flex-wrap gap-x-3 gap-y-1 uppercase tracking-wider">
+                                <span><i class="fa-solid fa-bolt mr-1 text-slate-500"></i>${app.power}W × ${app.qty}</span>
+                                <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>${app.hours}h/day</span>
+                                <span class="text-primary ml-auto">${monthlyKwh.toFixed(1)} kWh/mo</span>
+                            </div>
+                            <!-- Inline slider -->
+                            <div class="mt-3 flex items-center gap-3">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Usage</span>
+                                <input type="range" min="0" max="24" step="0.5" value="${app.hours}" 
+                                    onchange="updateApplianceHours(${app.id}, this.value)"
+                                    oninput="this.nextElementSibling.innerText = this.value + 'h'"
+                                    class="flex-grow h-1 bg-slate-700/50 rounded-full appearance-none">
+                                <span class="text-xs text-slate-300 w-8 text-right font-medium">${app.hours}h</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateApplianceHours(id, newHours) {
+            const app = appliances.find(a => a.id === id);
+            if(app) {
+                app.hours = parseFloat(newHours);
+                calculateFromAppliances();
+                renderApplianceList();
+            }
+        }
+
+        function removeAppliance(id) {
+            appliances = appliances.filter(a => a.id !== id);
+            renderApplianceList();
+            calculateFromAppliances();
+        }
+
+        // --- Modal Logic ---
+        function openAddApplianceModal() {
+            const modal = document.getElementById('add-appliance-modal');
+            const content = document.getElementById('modal-content');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                content.classList.remove('scale-95', 'translate-y-4');
+                content.classList.add('scale-100', 'translate-y-0');
+            }, 10);
+            
+            // Clear inputs safely
+            document.getElementById('new-app-name').value = '';
+            document.getElementById('new-app-power').value = '';
+            document.getElementById('new-app-qty').value = '1';
+            document.getElementById('new-app-hours').value = '8';
+            document.getElementById('modal-hours-display').innerText = '8';
+        }
+
+        function closeAddApplianceModal() {
+            const modal = document.getElementById('add-appliance-modal');
+            const content = document.getElementById('modal-content');
+            
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100', 'translate-y-0');
+            content.classList.add('scale-95', 'translate-y-4');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        let selectedPresetColor = '#cbd5e1';
+        let selectedPresetIcon = 'fa-plug';
+
+        function selectPreset(type) {
+            const preset = presetAppliances[type];
+            document.getElementById('new-app-name').value = preset.name;
+            document.getElementById('new-app-power').value = preset.power;
+            selectedPresetIcon = preset.icon;
+            selectedPresetColor = preset.color;
+            
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('border-primary', 'bg-primary/5');
+            });
+            event.currentTarget.classList.add('border-primary', 'bg-primary/5');
+        }
+
+        function addAppliance() {
+            const name = document.getElementById('new-app-name').value || 'Custom Device';
+            const power = parseFloat(document.getElementById('new-app-power').value);
+            const qty = parseInt(document.getElementById('new-app-qty').value) || 1;
+            const hours = parseFloat(document.getElementById('new-app-hours').value) || 0;
+
+            if(!power || power <= 0) {
+                // simple visual shake instead of blocky alert
+                const modal = document.getElementById('modal-content');
+                modal.style.transform = "translateX(-10px)";
+                setTimeout(()=> modal.style.transform = "translateX(10px)", 50);
+                setTimeout(()=> modal.style.transform = "scale(100%) translateY(0)", 100);
+                return;
+            }
+
+            appliances.push({
+                id: Date.now(),
+                name, power, qty, hours,
+                icon: selectedPresetIcon,
+                color: selectedPresetColor
+            });
+
+            selectedPresetIcon = 'fa-plug';
+            selectedPresetColor = '#cbd5e1';
+
+            closeAddApplianceModal();
+            renderApplianceList();
+            calculateFromAppliances();
+        }
+
+        // --- Tariff Settings ---
+        function renderTariffSettings() {
+            const container = document.getElementById('slabs-container');
+            container.innerHTML = '';
+            
+            document.getElementById('fixed-charge').value = fixedCharge;
+            document.getElementById('tax-rate').value = taxRate;
+
+            tariffSlabs.forEach((slab, index) => {
+                let prevLimit = index === 0 ? 0 : tariffSlabs[index-1].limit;
+                let rangeText = slab.limit > 900000 ? `> ${prevLimit} units` : `${prevLimit+1} - ${slab.limit} units`;
+                if(index === 0) rangeText = `0 - ${slab.limit} units`;
+
+                container.innerHTML += `
+                    <div class="flex items-center gap-4 bg-slate-800/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                        <div class="flex-grow">
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">${rangeText}</div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-semibold text-slate-400">Up to</span>
+                                <input type="number" value="${slab.limit > 900000 ? '' : slab.limit}" ${slab.limit > 900000 ? 'disabled placeholder="∞"' : ''} 
+                                    class="w-20 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-sm font-medium focus:outline-none focus:border-primary transition-colors text-center"
+                                    onchange="updateSlab(${slab.id}, 'limit', this.value)">
+                                <span class="text-xs font-semibold text-slate-400">kWh</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 bg-slate-900/50 p-2 rounded-lg border border-slate-700/50">
+                            <span class="text-sm font-bold text-slate-400 pl-1">₹</span>
+                            <input type="number" step="0.1" value="${slab.rate}" 
+                                class="w-16 bg-transparent text-white text-sm font-bold focus:outline-none focus:text-primary transition-colors"
+                                onchange="updateSlab(${slab.id}, 'rate', this.value)">
+                        </div>
+                        ${index > 0 && slab.limit <= 900000 ? `
+                        <button onclick="removeSlab(${slab.id})" class="text-slate-500 hover:text-red-400 p-2 transition-colors">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        ` : '<div class="w-8"></div>'}
+                    </div>
+                `;
+            });
+        }
+
+        function updateSlab(id, field, value) {
+            const slab = tariffSlabs.find(s => s.id === id);
+            if(slab) {
+                if(field === 'limit') slab.limit = value === '' ? 999999 : parseFloat(value);
+                else slab.rate = parseFloat(value);
+                
+                tariffSlabs.sort((a,b) => a.limit - b.limit);
+                saveTariffSettings();
+                renderTariffSettings(); 
+            }
+        }
+
+        function removeSlab(id) {
+            tariffSlabs = tariffSlabs.filter(s => s.id !== id);
+            saveTariffSettings();
+            renderTariffSettings();
+        }
+
+        function addSlab() {
+            const highestCurrentLimit = tariffSlabs.filter(s => s.limit <= 900000).reduce((max, s) => s.limit > max ? s.limit : max, 0);
+            tariffSlabs.push({ id: Date.now(), limit: highestCurrentLimit + 100, rate: 5.0 });
+            tariffSlabs.sort((a,b) => a.limit - b.limit);
+            saveTariffSettings();
+            renderTariffSettings();
+        }
+
+        function saveTariffSettings() {
+            fixedCharge = parseFloat(document.getElementById('fixed-charge').value) || 0;
+            taxRate = parseFloat(document.getElementById('tax-rate').value) || 0;
+            if(currentMode === 'meter') calculateFromMeter();
+            else calculateFromAppliances();
+        }
+
+        // --- Charts (Chart.js) ---
+        function initCharts() {
+            Chart.defaults.color = '#64748b'; // slate-500
+            Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+            
+            const costCtx = document.getElementById('costBreakdownChart').getContext('2d');
+            costChartInstance = new Chart(costCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Energy Charge', 'Fixed Charge', 'Taxes & Duty'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#6366f1', '#a855f7', '#14b8a6'],
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { position: 'right', labels: { usePointStyle: true, padding: 20, font: {weight: '500'} } },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: "'Plus Jakarta Sans', sans-serif" },
+                            bodyFont: { family: "'Outfit', sans-serif", size: 14, weight: 'bold' },
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: { label: function(c) { return ' ₹' + c.raw.toFixed(2); } }
+                        }
+                    }
+                }
+            });
+
+            const usageCtx = document.getElementById('applianceUsageChart').getContext('2d');
+            usageChartInstance = new Chart(usageCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Consumption',
+                        data: [],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.03)' }, border: {display: false} },
+                        x: { grid: { display: false }, border: {display: false} }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: "'Plus Jakarta Sans', sans-serif" },
+                            bodyFont: { family: "'Outfit', sans-serif", size: 14, weight: 'bold' },
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: { label: function(c) { return c.raw.toFixed(1) + ' kWh'; } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            if(!costChartInstance) return;
+
+            // Update Cost Chart
+            costChartInstance.data.datasets[0].data = [
+                billDetails.energyCharge, 
+                billDetails.fixedCharge, 
+                billDetails.taxAmount
+            ];
+            costChartInstance.update();
+
+            // Update Appliance Chart 
+            if(currentMode === 'appliance' && usageChartInstance) {
+                let sortedApps = [...appliances].sort((a,b) => b.monthlyConsumption - a.monthlyConsumption);
+                usageChartInstance.data.labels = sortedApps.map(a => a.name.split(' ')[0]); 
+                usageChartInstance.data.datasets[0].data = sortedApps.map(a => a.monthlyConsumption);
+                usageChartInstance.data.datasets[0].backgroundColor = sortedApps.map(a => a.color || '#6366f1');
+                usageChartInstance.update();
+            }
+        }
     </script>
 </body>
 </html>
